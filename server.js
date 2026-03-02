@@ -40,6 +40,25 @@ function calculateACValue(numbers) {
 
 const app = express();
 
+// 閲覧制限：特定のIP（自分自身）以外からの書き込みを拒否するミドルウェア
+const allowOnlyLocal = (req, res, next) => {
+    // Render.comなどのプロキシ経由でも正しくIPを取るための設定
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // ローカル環境（localhost / ::1 / 127.0.0.1）かどうか判定
+    const isLocal = ip.includes('127.0.0.1') || ip === '::1' || ip.includes('localhost');
+
+    if (isLocal) {
+        next(); // ローカルなら許可
+    } else {
+        // 外部（本番環境のURL）からのアクセスは「見るだけ」
+        res.status(403).json({ 
+            error: "閲覧制限モード", 
+            message: "本番環境でのデータ更新は制限されています。管理者のローカル環境から更新してください。" 
+        });
+    }
+};
+
 // publicフォルダの中身（HTML/JS/CSS）を自動で公開する設定
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -142,7 +161,7 @@ app.get('/api/tousen/latest', async (req, res) => {
 /**
  * 2. 単一登録API (Single Registration API)
  */
-app.post('/api/tousen/register', async (req, res) => {
+app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     const data = req.body;
     const createdAt = new Date().toISOString();
    
@@ -469,7 +488,7 @@ app.post('/api/tousen/bulk-register', async (req, res) => {
 });
 
 // 最新の当選番号を公式サイトから取得するAPI
-app.get('/api/tousen/fetch-latest', async (req, res) => {
+app.get('/api/tousen/fetch-latest', allowOnlyLocal, async (req, res) => {
     try {
         // 非常に安定して取得可能な攻略サイトをターゲットにします
         const url = 'https://loto6.thekyo.jp/';
