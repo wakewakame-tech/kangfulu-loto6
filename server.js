@@ -161,6 +161,11 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
     }
 });
 
+// すべてのルート（/）へのアクセスを index.html に誘導する設定
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html')); 
+});
+
 // サーバー起動
 initializeDB().then(() => {
     const PORT = process.env.PORT || 3000;
