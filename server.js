@@ -162,7 +162,7 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
 });
 
 // すべてのルート（/）へのアクセスを index.html に誘導する設定
-app.get('/:any*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html')); 
 });
 
