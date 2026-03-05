@@ -185,7 +185,8 @@ app.get('/api/tousen/hazure/:num', async (req, res) => {
 });
 
 // --- 追加：はずれ回数などの一括更新用API（もしapp.jsから呼ばれる場合） ---
-app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
+//app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
+  app.get('/api/tousen/by-kaibetsu/:kaibetsu', async (req, res) => {
     console.log(`[SERVER DEBUG] Fetching record for kaibetsu: ${req.params.kaibetsu}`); // ★追加
     try {
         const result = await pool.query('SELECT * FROM tousenbango WHERE kaibetsu = $1', [req.params.kaibetsu]);
@@ -240,6 +241,17 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
         res.json(mappedRows);
     } catch (e) {
         res.status(500).send('History API error');
+    }
+});
+
+// --- app.js の「/api/hazure/latest」という要求に応える ---
+app.get('/api/hazure/latest', async (req, res) => {
+    try {
+        // 全数字（1-43）のはずれ回数を一気に計算して返す例
+        // ここでは一旦、最新回だけを返すか、空の成功レスポンスを返してエラーを防ぎます
+        res.json({ success: true, message: "Hazure sync point" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 });
 
