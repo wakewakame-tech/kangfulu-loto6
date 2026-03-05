@@ -40,6 +40,7 @@ const allowOnlyLocal = (req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const isLocal = ip.includes('127.0.0.1') || ip === '::1' || ip.includes('localhost');
     if (isLocal) {
+        console.log(`[SERVER DEBUG] Incoming Request: ${req.method} ${req.url}`);
         next();
     } else {
         res.status(403).json({ error: "閲覧制限モード", message: "本番環境でのデータ更新は制限されています。" });
@@ -185,8 +186,10 @@ app.get('/api/tousen/hazure/:num', async (req, res) => {
 
 // --- 追加：はずれ回数などの一括更新用API（もしapp.jsから呼ばれる場合） ---
 app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
+    console.log(`[SERVER DEBUG] Fetching record for kaibetsu: ${req.params.kaibetsu}`); // ★追加
     try {
         const result = await pool.query('SELECT * FROM tousenbango WHERE kaibetsu = $1', [req.params.kaibetsu]);
+        console.log(`[SERVER DEBUG] DB Result rows count: ${result.rows.length}`); // ★追加
         if (result.rows.length > 0) {
             // app.jsが期待するキャメルケースに変換して返す
             const r = result.rows[0];
@@ -201,9 +204,11 @@ app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
                 }
             });
         } else {
+            console.warn(`[SERVER DEBUG] Kaibetsu ${req.params.kaibetsu} not found in DB`); // ★追加
             res.status(404).json({ success: false, message: 'Not found' });
         }
     } catch (e) {
+        console.error(`[SERVER DEBUG] SQL Error: ${e.message}`); // ★追加
         res.status(500).json({ error: e.message });
     }
 });

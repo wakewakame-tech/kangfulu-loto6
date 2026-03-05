@@ -47,11 +47,12 @@ var buildUrl = function(endpoint) {
 
 var apiGet = async function(endpoint) {
 	const url = buildUrl(endpoint);
-	
+	console.log(`[DEBUG] Requesting URL: ${url}`); // ★追加：実際に叩いているURLを確認
     try {
         const response = await fetch(url);
         if (!response.ok) {
             const errorText = await response.text();
+            console.error(`[DEBUG] Response Error: ${response.status} ${response.statusText}`); // ★追加：ステータスコードを確認
             try {
                 const errorData = JSON.parse(errorText);
                 throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown API Error'}`);
