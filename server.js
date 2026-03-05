@@ -161,6 +161,60 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
     }
 });
 
+// --- 追加：特定の数字の「はずれ回数」を取得するAPI ---
+app.get('/api/tousen/hazure/:num', async (req, res) => {
+    try {
+        const num = req.params.num;
+        // 最新の当選回から、その数字が最後に出た回を探す
+        const result = await pool.query(
+            `SELECT MAX(kaibetsu) as last_kaibetsu FROM tousenbango 
+             WHERE $1 IN (hit1, hit2, hit3, hit4, hit5, hit6)`, 
+            [num]
+        );
+        const latest = await pool.query('SELECT MAX(kaibetsu) as max_k FROM tousenbango');
+        
+        const lastKaibetsu = result.rows[0].last_kaibetsu || 0;
+        const currentMax = latest.rows[0].max_k || 0;
+        
+        res.json({ num, hazureKaisu: currentMax - lastKaibetsu });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('Hazure calculation error');
+    }
+});
+
+// --- 既存の履歴取得APIを改善（小文字をapp.jsが理解できる形式に変換） ---
+app.get('/api/tousen/history/:limit', async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM tousenbango ORDER BY kaibetsu DESC LIMIT $1', 
+            [req.params.limit]
+        );
+        
+        // Postgresの小文字カラムをapp.jsが期待する名前へ変換
+        const mappedRows = result.rows.map(r => ({
+            kaibetsu: r.kaibetsu,
+            hit1: r.hit1, hit2: r.hit2, hit3: r.hit3, hit4: r.hit4, hit5: r.hit5, hit6: r.hit6,
+            bonus: r.bonus,
+            acValue: r.acvalue,          // 小文字を大文字混じりに
+            rinsetsuCount: r.rinsetsucount,
+            repeatCount: r.repeatcount,
+            shimoiichikiCount: r.shimoiichikicount,
+            goukei: r.goukei,
+            guusuu: r.guusuu,
+            daishou: r.daishou,
+            hotCount: r.hotcount,
+            coldCount: r.coldcount,
+            hotColdPattern: r.hotcoldpattern
+        }));
+        
+        res.json(mappedRows);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('History API error');
+    }
+});
+
 // すべてのルート（/）へのアクセスを index.html に誘導する設定
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html')); 
