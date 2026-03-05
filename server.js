@@ -164,7 +164,7 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
 // --- 追加：特定の数字の「はずれ回数」を取得するAPI ---
 app.get('/api/tousen/hazure/:num', async (req, res) => {
     try {
-        const num = req.params.num;
+        const num = parseInt(req.params.num);
         // 最新の当選回から、その数字が最後に出た回を探す
         const result = await pool.query(
             `SELECT MAX(kaibetsu) as last_kaibetsu FROM tousenbango 
@@ -176,14 +176,39 @@ app.get('/api/tousen/hazure/:num', async (req, res) => {
         const lastKaibetsu = result.rows[0].last_kaibetsu || 0;
         const currentMax = latest.rows[0].max_k || 0;
         
-        res.json({ num, hazureKaisu: currentMax - lastKaibetsu });
+        res.json({ num: num, hazureKaisu: currentMax - lastKaibetsu });
     } catch (e) {
         console.error(e);
-        res.status(500).send('Hazure calculation error');
+        res.status(500).json({ error: 'Hazure calculation error' });
     }
 });
 
-// --- 既存の履歴取得APIを改善（小文字をapp.jsが理解できる形式に変換） ---
+// --- 追加：はずれ回数などの一括更新用API（もしapp.jsから呼ばれる場合） ---
+app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM tousenbango WHERE kaibetsu = $1', [req.params.kaibetsu]);
+        if (result.rows.length > 0) {
+            // app.jsが期待するキャメルケースに変換して返す
+            const r = result.rows[0];
+            res.json({
+                success: true,
+                data: {
+                    kaibetsu: r.kaibetsu,
+                    hit1: r.hit1, hit2: r.hit2, hit3: r.hit3, hit4: r.hit4, hit5: r.hit5, hit6: r.hit6,
+                    acValue: r.acvalue,
+                    rinsetsuCount: r.rinsetsucount,
+                    // 必要に応じて他のカラムも追加
+                }
+            });
+        } else {
+            res.status(404).json({ success: false, message: 'Not found' });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// --- 既存の履歴取得APIも「小文字→大文字」変換付きに差し替え ---
 app.get('/api/tousen/history/:limit', async (req, res) => {
     try {
         const result = await pool.query(
@@ -191,12 +216,11 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
             [req.params.limit]
         );
         
-        // Postgresの小文字カラムをapp.jsが期待する名前へ変換
         const mappedRows = result.rows.map(r => ({
             kaibetsu: r.kaibetsu,
             hit1: r.hit1, hit2: r.hit2, hit3: r.hit3, hit4: r.hit4, hit5: r.hit5, hit6: r.hit6,
             bonus: r.bonus,
-            acValue: r.acvalue,          // 小文字を大文字混じりに
+            acValue: r.acvalue,
             rinsetsuCount: r.rinsetsucount,
             repeatCount: r.repeatcount,
             shimoiichikiCount: r.shimoiichikicount,
@@ -210,7 +234,6 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
         
         res.json(mappedRows);
     } catch (e) {
-        console.error(e);
         res.status(500).send('History API error');
     }
 });
