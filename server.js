@@ -56,23 +56,23 @@ async function initializeDB() {
     try {
         // TousenBango
         await pool.query(`
-            CREATE TABLE IF NOT EXISTS TousenBango (
-                objectId SERIAL PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS tousenbango (
+                objectid SERIAL PRIMARY KEY,
                 kaibetsu INTEGER UNIQUE,
                 hit1 INTEGER, hit2 INTEGER, hit3 INTEGER, hit4 INTEGER, hit5 INTEGER, hit6 INTEGER,
                 bonus INTEGER, guusuu INTEGER, daishou INTEGER, goukei INTEGER,
-                createdAt TEXT, hotCount INTEGER, coldCount INTEGER, hotColdPattern TEXT, computedAt TEXT,
-                rinsetsuCount INTEGER DEFAULT 0, repeatCount INTEGER DEFAULT 0,
-                shimoiichikiCount INTEGER DEFAULT 0, acValue INTEGER DEFAULT 0
+                createdat TEXT, hotcount INTEGER, coldcount INTEGER, hotcoldpattern TEXT, computedat TEXT,
+                rinsetsucount INTEGER DEFAULT 0, repeatcount INTEGER DEFAULT 0,
+                shimoiichikicount INTEGER DEFAULT 0, acvalue INTEGER DEFAULT 0
             )
         `);
         // HazureKaisu
         await pool.query(`
-            CREATE TABLE IF NOT EXISTS HazureKaisu (
-                objectId SERIAL PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS hazurekaisu (
+                objectid SERIAL PRIMARY KEY,
                 kaibetsu INTEGER UNIQUE,
                 ${Array.from({length:43}, (_, i) => `k${(i+1).toString().padStart(2,'0')} INTEGER`).join(', ')},
-                goukei INTEGER, L10 INTEGER, createdAt TEXT
+                goukei INTEGER, l10 INTEGER, createdat TEXT
             )
         `);
         console.log('Postgres tables ensured.');
@@ -84,7 +84,7 @@ async function initializeDB() {
 // API: 最新レコード取得
 app.get('/api/tousen/latest', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM TousenBango ORDER BY kaibetsu DESC LIMIT 1');
+        const result = await pool.query('SELECT * FROM tousenbango ORDER BY kaibetsu DESC LIMIT 1');
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
         } else {
@@ -106,14 +106,14 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     const goukei = hits.reduce((a, b) => a + b, 0);
 
     // 直近10件からHotSet作成
-    const recent = await pool.query('SELECT hit1, hit2, hit3, hit4, hit5, hit6 FROM TousenBango ORDER BY kaibetsu DESC LIMIT 10');
+    const recent = await pool.query('SELECT hit1, hit2, hit3, hit4, hit5, hit6 FROM tousenbango ORDER BY kaibetsu DESC LIMIT 10');
     const hotSet = new Set();
     recent.rows.forEach(r => [r.hit1, r.hit2, r.hit3, r.hit4, r.hit5, r.hit6].forEach(n => hotSet.add(n)));
     
     const { hotCount, coldCount, hotColdPattern, computedAt } = await computeHotColdForRecord(data, hotSet);
     
     // 前回データ取得（隣接・リピート用）
-    const prevRes = await pool.query('SELECT * FROM TousenBango WHERE kaibetsu = $1', [data.kaibetsu - 1]);
+    const prevRes = await pool.query('SELECT * FROM tousenbango WHERE kaibetsu = $1', [data.kaibetsu - 1]);
     const prev = prevRes.rows[0];
     
     let rinsetsuCount = 0;
@@ -132,19 +132,19 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     const acValue = calculateACValue(hits);
 
     const sql = `
-        INSERT INTO TousenBango (kaibetsu, hit1, hit2, hit3, hit4, hit5, hit6, bonus, guusuu, daishou, goukei, createdAt, hotCount, coldCount, hotColdPattern, computedAt, rinsetsuCount, repeatCount, shimoiichikiCount, acValue)
+        INSERT INTO tousenbango (kaibetsu, hit1, hit2, hit3, hit4, hit5, hit6, bonus, guusuu, daishou, goukei, createdat, hotcount, coldcount, hotcoldpattern, computedat, rinsetsucount, repeatcount, shimoiichikicount, acvalue)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
         ON CONFLICT(kaibetsu) DO UPDATE SET
             hit1=EXCLUDED.hit1, hit2=EXCLUDED.hit2, hit3=EXCLUDED.hit3, hit4=EXCLUDED.hit4, hit5=EXCLUDED.hit5, hit6=EXCLUDED.hit6,
             bonus=EXCLUDED.bonus, guusuu=EXCLUDED.guusuu, daishou=EXCLUDED.daishou, goukei=EXCLUDED.goukei, 
-            createdAt=EXCLUDED.createdAt, hotCount=EXCLUDED.hotCount, coldCount=EXCLUDED.coldCount, 
-            hotColdPattern=EXCLUDED.hotColdPattern, computedAt=EXCLUDED.computedAt,
-            rinsetsuCount=EXCLUDED.rinsetsuCount, repeatCount=EXCLUDED.repeatCount, 
-            shimoiichikiCount=EXCLUDED.shimoiichikiCount, acValue=EXCLUDED.acValue
+            createdat=EXCLUDED.createdat, hotcount=EXCLUDED.hotcount, coldcount=EXCLUDED.coldcount, 
+            hotcoldpattern=EXCLUDED.hotcoldpattern, computedat=EXCLUDED.computedat,
+            rinsetsucount=EXCLUDED.rinsetsucount, repeatcount=EXCLUDED.repeatcount, 
+            shimoiichikicount=EXCLUDED.shimoiichikicount, acvalue=EXCLUDED.acvalue
     `;
 
     try {
-        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, createdAt, hotCount, coldCount, hotColdPattern, computedAt, rinsetsuCount, repeatCount, shimoiichikiCount, acValue]);
+        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, createdat, hotcount, coldcount, hotcoldpattern, computedat, rinsetsucount, repeatcount, shimoiichikicount, acvalue]);
         res.json({ message: 'Success', kaibetsu: data.kaibetsu });
     } catch (e) {
         console.error(e);
@@ -155,7 +155,7 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
 // API: 履歴取得
 app.get('/api/tousen/history/:limit', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM TousenBango ORDER BY kaibetsu DESC LIMIT $1', [req.params.limit]);
+        const result = await pool.query('SELECT * FROM tousenbango ORDER BY kaibetsu DESC LIMIT $1', [req.params.limit]);
         res.json(result.rows);
     } catch (e) {
         res.status(500).send('Database error.');
@@ -258,6 +258,12 @@ app.get('/api/hazure/latest', async (req, res) => {
 // すべてのルート（/）へのアクセスを index.html に誘導する設定
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html')); 
+});
+
+// 404エラーをJSONで返す（HTMLが返るのを防ぐ）
+app.use((req, res) => {
+    console.warn(`[404] Not Found: ${req.url}`);
+    res.status(404).json({ success: false, message: `Endpoint ${req.url} not found.` });
 });
 
 // サーバー起動
