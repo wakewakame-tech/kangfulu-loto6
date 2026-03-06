@@ -184,6 +184,54 @@ app.get('/api/tousen/hazure/:num', async (req, res) => {
     }
 });
 
+app.post('/api/hazure/update', async (req, res) => {
+    const data = req.body;
+    const createdAt = new Date().toISOString();
+    
+    // Calculate Goukei and L10 on the server side
+    let goukei = 0;
+    let L10 = 0;
+    for (let i = 1; i <= 43; i++) {
+        const key = 'k' + (i < 10 ? '0' + i : i);
+        if (data[key] !== undefined) {
+            goukei += data[key];
+            if (data[key] < 10) L10++;
+        }
+    }
+    data.goukei = goukei;
+    data.L10 = L10;
+
+    const columns = ['kaibetsu', 'goukei', 'L10', 'createdat'];
+    const values = [data.kaibetsu, goukei, L10, createdat];
+    const updateSets = ['goukei=excluded.goukei', 'L10=excluded.L10', 'createdAt=excluded.createdat'];
+    
+    for (let i = 1; i <= 43; i++) {
+        const key = 'k' + (i < 10 ? '0' + i : i);
+        columns.push(key);
+        values.push(data[key] || 0); // Default to 0 if missing
+        updateSets.push(`${key}=excluded.${key}`);
+    }
+
+    const sql = `
+        INSERT INTO hazurekaisu (${columns.join(', ')}) 
+        VALUES (${columns.map(() => '?').join(', ')})
+        ON CONFLICT(kaibetsu) DO UPDATE SET
+            ${updateSets.join(', ')}
+    `;
+
+    try {
+        const result = await db.run(sql, values);
+        if (result.changes > 0) {
+            res.json({ message: 'hazurekaisu updated/registered.', kaibetsu: data.kaibetsu, objectId: result.lastid || data.kaibetsu });
+        } else {
+            res.status(400).json({ message: 'No changes made.' });
+        }
+    } catch (e) {
+        console.error('Error updating hazurekaisu:', e);
+        res.status(500).send('Database error during hazurekaisu update.');
+    }
+});
+
 // --- 追加：はずれ回数などの一括更新用API（もしapp.jsから呼ばれる場合） ---
 //app.get('/api/tousen/record/:kaibetsu', async (req, res) => {
   app.get('/api/tousen/by-kaibetsu/:kaibetsu', async (req, res) => {
