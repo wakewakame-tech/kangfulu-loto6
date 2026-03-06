@@ -214,14 +214,14 @@ var hazerukaisuUpdate = async function(latestTousen) {
 
     let latestHazure = await apiGet('hazure/latest');
 
-    console.log(`hazerukaisuUpdate 2`);
+    console.log(`[DEBUG] サーバーから取得した最新回情報 latestHazure.kaibetsu: ${latestHazure.kaibetsu}`);
 
-    let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
+    // let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
+    let currentKaibetsu = 1;
     let recordsUpdated = 0;
 
     console.log(`[DEBUG] latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
     console.log(`[DEBUG] currentKaibetsu: ${currentKaibetsu}`);
-    console.log(`[DEBUG] サーバーから取得した最新回情報 latestHazure.kaibetsu: ${latestHazure.kaibetsu}`);
     const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
     console.log(`[DEBUG] ループを開始します。maxLoop: ${maxLoop}`);
 

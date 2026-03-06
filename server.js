@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // DB初期化（テーブル作成）
 async function initializeDB() {
     try {
-        // TousenBango
+        // tousenbango
         await pool.query(`
             CREATE TABLE IF NOT EXISTS tousenbango (
                 objectid SERIAL PRIMARY KEY,
