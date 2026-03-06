@@ -210,16 +210,22 @@ var bulkRegister = function() {
 // --- Core Application Logic: HazureKaisu (Miss Count) ---
 
 var hazerukaisuUpdate = async function(latestTousen) {
-    console.log("hazureKaisuUpdate starting...");
-    
+    console.log(`hazureKaisuUpdate starting...`);
+    console.log(`hazureKaisuUpdate latestTousen.kaibetsu: `, latestTousen.kaibetsu);
     let latestHazure = await apiGet('hazure/latest');
+
+    console.log(`hazerukaisuUpdate 2`);
+
     let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
     let recordsUpdated = 0;
 
-    console.log("[DEBUG] サーバーから取得した最新回情報:", latestHazure);
-
+    console.log(`hazerukaisuUpdate 3`);
+    console.log(`[DEBUG] サーバーから取得した最新回情報:`, latestHazure);
+    console.log(`hazerukaisuUpdate 4`);
     const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
+    console.log(`hazerukaisuUpdate 5`);
     console.log(`[DEBUG] ループを開始します。最大回数: ${maxLoop}`);
+    console.log(`hazerukaisuUpdate 6`);
 
     // while (currentKaibetsu <= latestTousen.kaibetsu) {
        while (currentKaibetsu <= maxLoop) {
