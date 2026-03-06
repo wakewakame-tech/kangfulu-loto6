@@ -247,12 +247,13 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
 // --- app.js の「/api/hazure/latest」という要求に応える ---
 app.get('/api/hazure/latest', async (req, res) => {
     try {
-        // 全数字（1-43）のはずれ回数を一気に計算して返す例
-        // ここでは一旦、最新回だけを返すか、空の成功レスポンスを返してエラーを防ぎます
-        res.json({ success: true, message: "Hazure sync point" });
+        const result = await pool.query('SELECT MAX(kaibetsu) as max_k FROM tousenbango');
+        const maxKaibetsu = result.rows[0].max_k || 0;
+        res.json({ success: true, kaibetsu: maxKaibetsu }); // kaibetsuを返す
     } catch (e) {
+        console.error(e);
         res.status(500).json({ error: e.message });
-    }
+    }    
 });
 
 // すべてのルート（/）へのアクセスを index.html に誘導する設定
