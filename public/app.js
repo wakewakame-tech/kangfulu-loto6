@@ -255,7 +255,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
             newHazure[key] = (newHazure[key] || 0) + 1; 
         }
 
-        const tousen = [data.hit1, data.hit2, data.hit3, data.hit4, data.hit5, data.hit6];
+        const tousen = [tousenRecord.hit1, tousenRecord.hit2, tousenRecord.hit3, tousenRecord.hit4, tousenRecord.hit5, tousenRecord.hit6];
         
         console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${tousen[0]}, ${tousen[1]}, ${tousen[2]}, ${tousen[3]}, ${tousen[4]}, ${tousen[5]}, ]`);
 
