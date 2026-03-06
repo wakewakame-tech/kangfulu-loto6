@@ -60,6 +60,7 @@ var apiGet = async function(endpoint) {
                 throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
             }
         }
+        console.log(`[DEBUG] response: ${response}`); // ★追加
         return await response.json();
     } catch (error) {
         console.error('API Get Error:', error);
