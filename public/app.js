@@ -72,13 +72,14 @@ var apiSend = async function(endpoint, method, data) {
     const url = buildUrl(endpoint);
     console.log(`[apiSend] url: ${url}`);
     console.log(`[apiSend] method: ${method}`);
-    console.log(`[apiSend] data: ${data}`);
+    console.log(`[apiSend] data: ${data.kaibetsu}`);
     try {
         const response = await fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        console.log(`[apiSend] response: ${response}`);
         if (!response.ok) {
             // サーバーからのエラー応答を解析
             const errorText = await response.text();
