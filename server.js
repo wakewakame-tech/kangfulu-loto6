@@ -201,9 +201,9 @@ app.post('/api/hazure/update', async (req, res) => {
     data.goukei = goukei;
     data.L10 = L10;
 
-    const columns = ['kaibetsu', 'goukei', 'L10', 'createdat'];
-    const values = [data.kaibetsu, goukei, L10, createdat];
-    const updateSets = ['goukei=excluded.goukei', 'L10=excluded.L10', 'createdAt=excluded.createdat'];
+    const columns = ['kaibetsu', 'goukei', 'L10', 'createdAt'];
+    const values = [data.kaibetsu, goukei, L10, createdAt];
+    const updateSets = ['goukei=excluded.goukei', 'L10=excluded.L10', 'createdAt=excluded.createdAt'];
     
     for (let i = 1; i <= 43; i++) {
         const key = 'k' + (i < 10 ? '0' + i : i);
@@ -222,7 +222,7 @@ app.post('/api/hazure/update', async (req, res) => {
     try {
         const result = await db.run(sql, values);
         if (result.changes > 0) {
-            res.json({ message: 'hazurekaisu updated/registered.', kaibetsu: data.kaibetsu, objectId: result.lastid || data.kaibetsu });
+            res.json({ message: 'hazurekaisu updated/registered.', kaibetsu: data.kaibetsu, objectid: result.lastid || data.kaibetsu });
         } else {
             res.status(400).json({ message: 'No changes made.' });
         }
