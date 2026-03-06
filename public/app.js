@@ -211,7 +211,7 @@ var bulkRegister = function() {
 
 var hazerukaisuUpdate = async function(latestTousen) {
     console.log(`hazureKaisuUpdate starting...`);
-    console.log(`hazureKaisuUpdate latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
+
     let latestHazure = await apiGet('hazure/latest');
 
     console.log(`hazerukaisuUpdate 2`);
@@ -219,13 +219,11 @@ var hazerukaisuUpdate = async function(latestTousen) {
     let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
     let recordsUpdated = 0;
 
-    console.log(`hazerukaisuUpdate 3`);
-    console.log(`[DEBUG] サーバーから取得した最新回情報: ${latestHazure}`);
-    console.log(`hazerukaisuUpdate 4`);
+    console.log(`[DEBUG] latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
+    console.log(`[DEBUG] currentKaibetsu: ${currentKaibetsu}`);
+    console.log(`[DEBUG] サーバーから取得した最新回情報 latestHazure.kaibetsu: ${latestHazure.kaibetsu}`);
     const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
-    console.log(`hazerukaisuUpdate 5`);
-    console.log(`[DEBUG] ループを開始します。最大回数: ${maxLoop}`);
-    console.log(`hazerukaisuUpdate 6`);
+    console.log(`[DEBUG] ループを開始します。maxLoop: ${maxLoop}`);
 
     // while (currentKaibetsu <= latestTousen.kaibetsu) {
        while (currentKaibetsu <= maxLoop) {
