@@ -211,7 +211,7 @@ var bulkRegister = function() {
 
 var hazerukaisuUpdate = async function(latestTousen) {
     console.log(`hazureKaisuUpdate starting...`);
-    console.log(`hazureKaisuUpdate latestTousen.kaibetsu: `, latestTousen.kaibetsu);
+    console.log(`hazureKaisuUpdate latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
     let latestHazure = await apiGet('hazure/latest');
 
     console.log(`hazerukaisuUpdate 2`);
@@ -220,7 +220,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
     let recordsUpdated = 0;
 
     console.log(`hazerukaisuUpdate 3`);
-    console.log(`[DEBUG] サーバーから取得した最新回情報:`, latestHazure);
+    console.log(`[DEBUG] サーバーから取得した最新回情報: ${latestHazure}`);
     console.log(`hazerukaisuUpdate 4`);
     const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
     console.log(`hazerukaisuUpdate 5`);
@@ -235,11 +235,11 @@ var hazerukaisuUpdate = async function(latestTousen) {
         const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
 
         // サーバーからの生のレスポンスをログに出す（最重要！）
-        console.log(`[DEBUG] 第${i}回のレスポンス内容:`, tousenRecord);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, tousenRecord);
 
         if (!tousenRecord) {
             console.warn(`TousenBango record missing for kaibetsu ${currentKaibetsu}. Stopping loop.`);
-            console.warn(`[DEBUG] 第${i}回が見つからない、またはエラーのためループを終了します。原因:`, res ? res.message : "レスポンス空");
+            console.warn(`[DEBUG] 第${currentKaibetsu}回が見つからない、またはエラーのためループを終了します。原因:`, res ? res.message : "レスポンス空");
             break; 
         }
 
@@ -259,7 +259,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
 
         const tousen = [tousenRecord.hit1, tousenRecord.hit2, tousenRecord.hit3, tousenRecord.hit4, tousenRecord.hit5, tousenRecord.hit6, tousenRecord.bonus];
         
-        console.log(`[DEBUG] 第${i}回のデータ解析を開始: hits=[${tousenRecord.hit1}, ${tousenRecord.hit2}, ${tousenRecord.hit3}, ${tousenRecord.hit4}, ${tousenRecord.hit5}, ${tousenRecord.hit6}, ]`);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${tousenRecord.hit1}, ${tousenRecord.hit2}, ${tousenRecord.hit3}, ${tousenRecord.hit4}, ${tousenRecord.hit5}, ${tousenRecord.hit6}, ]`);
 
         tousen.forEach(num => {
              const key = 'k' + (num < 10 ? '0' + num : num);
@@ -273,7 +273,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
         delete newHazure.L10;
         
         // 更新処理の直前にログ
-        console.log(`[DEBUG] 第${i}回の更新APIを叩きます...`);
+        console.log(`[DEBUG] 第${currentKaibetsu}回の更新APIを叩きます...`);
 
         const result = await apiSend('hazure/update', 'POST', newHazure);
         
@@ -284,7 +284,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
                 objectId: result.objectId, 
                 kaibetsu: currentKaibetsu 
             };
-            console.log(`[DEBUG] 第${i}回の更新結果:`, result);
+            console.log(`[DEBUG] 第${currentKaibetsu}回の更新結果:`, result);
         } else {
             console.error(`Error updating HazureKaisu for kaibetsu ${currentKaibetsu}. Stopping loop.`);
             break; 
