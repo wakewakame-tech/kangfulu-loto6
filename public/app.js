@@ -220,8 +220,13 @@ var hazerukaisuUpdate = async function(latestTousen) {
         console.log(`Processing kaibetsu: ${currentKaibetsu}`);
         
         const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
+
+        // サーバーからの生のレスポンスをログに出す（最重要！）
+        console.log(`[DEBUG] 第${i}回のレスポンス内容:`, tousenRecord);
+
         if (!tousenRecord) {
             console.warn(`TousenBango record missing for kaibetsu ${currentKaibetsu}. Stopping loop.`);
+            console.warn(`[DEBUG] 第${i}回が見つからない、またはエラーのためループを終了します。原因:`, res ? res.message : "レスポンス空");
             break; 
         }
 
@@ -241,6 +246,8 @@ var hazerukaisuUpdate = async function(latestTousen) {
 
         const tousen = [tousenRecord.hit1, tousenRecord.hit2, tousenRecord.hit3, tousenRecord.hit4, tousenRecord.hit5, tousenRecord.hit6, tousenRecord.bonus];
         
+        console.log(`[DEBUG] 第${i}回のデータ解析を開始: hits=[${tousenRecord.hit1}, ${tousenRecord.hit2}, ${tousenRecord.hit3}, ${tousenRecord.hit4}, ${tousenRecord.hit5}, ${tousenRecord.hit6}, ]`);
+
         tousen.forEach(num => {
              const key = 'k' + (num < 10 ? '0' + num : num);
              newHazure[key] = 0; 
@@ -252,6 +259,9 @@ var hazerukaisuUpdate = async function(latestTousen) {
         delete newHazure.goukei; 
         delete newHazure.L10;
         
+        // 更新処理の直前にログ
+        console.log(`[DEBUG] 第${i}回の更新APIを叩きます...`);
+
         const result = await apiSend('hazure/update', 'POST', newHazure);
         
         if (result) {
@@ -261,6 +271,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
                 objectId: result.objectId, 
                 kaibetsu: currentKaibetsu 
             };
+            console.log(`[DEBUG] 第${i}回の更新結果:`, result);
         } else {
             console.error(`Error updating HazureKaisu for kaibetsu ${currentKaibetsu}. Stopping loop.`);
             break; 
@@ -268,7 +279,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
 
         currentKaibetsu++; 
     }
-    
+    console.log("[DEBUG] hazerukaisuUpdate: すべてのループが終了しました");
     return recordsUpdated > 0;
 };
 
