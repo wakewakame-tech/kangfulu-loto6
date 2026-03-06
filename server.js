@@ -6,6 +6,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const app = express();
+let db;
 
 // Postgres接続設定（Renderの環境変数を使用）
 const pool = new Pool({
