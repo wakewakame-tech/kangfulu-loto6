@@ -79,7 +79,7 @@ var apiSend = async function(endpoint, method, data) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        console.log(`[apiSend] response: ${response}`);
+        console.log(`[apiSend] response: ${response.body}`);
         if (!response.ok) {
             // サーバーからのエラー応答を解析
             const errorText = await response.text();
