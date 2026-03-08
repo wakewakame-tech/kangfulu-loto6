@@ -302,7 +302,7 @@ app.get('/api/hazure/latest', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: e.message });
-    }    
+    }
 });
 
 // すべてのルート（/）へのアクセスを index.html に誘導する設定
