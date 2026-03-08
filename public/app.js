@@ -234,13 +234,14 @@ var hazerukaisuUpdate = async function(latestTousen) {
         
         console.log(`Processing kaibetsu: ${currentKaibetsu}`);
         
-        const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
+        // const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
+        const res = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
 
         // サーバーからの生のレスポンスをログに出す（最重要！）
-        console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, tousenRecord);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, res);
 
-        if (!tousenRecord || !tousenRecord.success || !tousenRecord.data) {
-            console.warn(`TousenBango record missing for kaibetsu ${currentKaibetsu}. Stopping loop.`);
+        if (!res || !res.success || !res.data) {
+            console.warn(`tousenbango record missing for kaibetsu ${currentKaibetsu}. Stopping loop.`);
             console.warn(`[DEBUG] 第${currentKaibetsu}回が見つからない、またはエラーのためループを終了します。原因:`, res ? res.message : "レスポンス空");
             break; 
         }
@@ -259,10 +260,10 @@ var hazerukaisuUpdate = async function(latestTousen) {
             newHazure[key] = (newHazure[key] || 0) + 1; 
         }
         
-        const d = tousenRecord.data;
-        const tousen = [d.hit1, d.hit2, d.hit3, d.hit4, d.hit5, d.hit6];
+        const d = res.data;
+        const hits = [d.hit1, d.hit2, d.hit3, d.hit4, d.hit5, d.hit6];
         
-        console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${tousen.join(', ')}]`);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${hits.join(', ')}]`);
 
         tousen.forEach(num => {
              const key = 'k' + (num < 10 ? '0' + num : num);

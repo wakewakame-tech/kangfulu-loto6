@@ -219,7 +219,7 @@ app.post('/api/hazure/update', async (req, res) => {
         ON CONFLICT(kaibetsu) DO UPDATE SET
             ${updateSets.join(', ')}
     `;
-
+    /*
     try {
         const result = await db.run(sql, values);
         if (result.changes > 0) {
@@ -230,6 +230,14 @@ app.post('/api/hazure/update', async (req, res) => {
     } catch (e) {
         console.error('Error updating hazurekaisu:', e);
         res.status(500).send('Database error during hazurekaisu update.');
+    }
+    */
+    try {
+        await pool.query(sql, values);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(`[SERVER ERROR] ${err.message}`);
+        res.status(500).json({ success: false, message: 'Database error' });
     }
 });
 
