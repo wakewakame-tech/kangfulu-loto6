@@ -265,7 +265,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
         
         console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${hits.join(', ')}]`);
 
-        d.forEach(num => {
+        res.forEach(num => {
              const key = 'k' + (num < 10 ? '0' + num : num);
              newHazure[key] = 0; 
         });
