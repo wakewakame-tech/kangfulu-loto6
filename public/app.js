@@ -235,7 +235,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
         console.log(`Processing kaibetsu: ${currentKaibetsu}`);
         
         // const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
-        const res = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
+        const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
 
         // サーバーからの生のレスポンスをログに出す（最重要！）
         console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, res);
@@ -260,12 +260,12 @@ var hazerukaisuUpdate = async function(latestTousen) {
             newHazure[key] = (newHazure[key] || 0) + 1; 
         }
         
-        const d = res.data;
-        const hits = [d.hit1, d.hit2, d.hit3, d.hit4, d.hit5, d.hit6];
+        // const d = res.data;
+        const tousen = [tousenRecord.hit1, tousenRecord.hit2, tousenRecord.hit3, tousenRecord.hit4, tousenRecord.hit5, tousenRecord.hit6];
         
-        console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${hits.join(', ')}]`);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${tousen.join(', ')}]`);
 
-        res.forEach(num => {
+        tousen.forEach(num => {
              const key = 'k' + (num < 10 ? '0' + num : num);
              newHazure[key] = 0; 
         });
