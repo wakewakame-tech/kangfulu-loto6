@@ -203,7 +203,7 @@ app.post('/api/hazure/update', async (req, res) => {
     }
     data.goukei = goukei;
     data.L10 = L10;
-
+    /*
     const columns = ['kaibetsu', 'goukei', 'L10', 'createdAt'];
     const values = [data.kaibetsu, goukei, L10, createdAt];
     const updateSets = ['goukei=excluded.goukei', 'L10=excluded.L10', 'createdAt=excluded.createdAt'];
@@ -214,26 +214,52 @@ app.post('/api/hazure/update', async (req, res) => {
         values.push(data[key] || 0); // Default to 0 if missing
         updateSets.push(`${key}=excluded.${key}`);
     }
+    */
+    try {
+        // 1. カラム名と値の配列を準備
+        // ログに基づき、不要な success を除き、必要なカラムを抽出
+        const columns = Object.keys(data).filter(key => key !== 'success');
+        const values = columns.map(key => data[key]);
+        
+        // 2. $1, $2, $3... のプレースホルダー文字列を作成
+        const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
+        
+        // 3. DO UPDATE SET 部分の作成 (kaibetsu以外のカラムを更新対象にする)
+        const updateSets = columns
+            .filter(col => col !== 'kaibetsu')
+            .map(col => `${col} = EXCLUDED.${col}`)
+            .join(', ');
 
+        // 4. SQL文の組み立て
+        const sql = `
+            INSERT INTO hazurekaisu (${columns.join(', ')})
+            VALUES (${placeholders})
+            ON CONFLICT (kaibetsu)
+            DO UPDATE SET ${updateSets}
+        `;
+
+        console.log(`[SERVER DEBUG] hazure/update sql: ${sql}`); // ★追加
+
+        await pool.query(sql, values);
+        res.json({ success: true, message: "Hazurekaisu updated (Postgres)" });
+
+    } catch (e) {
+        console.error(`[SERVER ERROR] Hazure Update Error:`, e.message);
+        res.status(500).json({ 
+            success: false, 
+            message: "Database error", 
+            detail: e.message 
+        });
+    }
+    /*
     const sql = `
         INSERT INTO hazurekaisu (${columns.join(', ')}) 
         VALUES (${columns.map(() => '?').join(', ')})
         ON CONFLICT(kaibetsu) DO UPDATE SET ${updateSets.join(', ')}
     `;
+    
     console.log(`[SERVER DEBUG] hazure/update sql: ${sql}`); // ★追加
-    /*
-    try {
-        const result = await db.run(sql, values);
-        if (result.changes > 0) {
-            res.json({ message: 'hazurekaisu updated/registered.', kaibetsu: data.kaibetsu, objectid: result.lastid || data.kaibetsu });
-        } else {
-            res.status(400).json({ message: 'No changes made.' });
-        }
-    } catch (e) {
-        console.error('Error updating hazurekaisu:', e);
-        res.status(500).send('Database error during hazurekaisu update.');
-    }
-    */
+
     try {
         await pool.query(sql, values);
         res.json({ success: true });
@@ -241,6 +267,7 @@ app.post('/api/hazure/update', async (req, res) => {
         console.error(`[SERVER ERROR] ${err.message}`);
         res.status(500).json({ success: false, message: 'Database error' });
     }
+    */
 });
 
 // --- 追加：はずれ回数などの一括更新用API（もしapp.jsから呼ばれる場合） ---
