@@ -334,7 +334,7 @@ app.get('/api/tousen/history/:limit', async (req, res) => {
 // --- app.js の「/api/hazure/latest」という要求に応える ---
 app.get('/api/hazure/latest', async (req, res) => {
     try {
-        const result = await pool.query('SELECT MAX(kaibetsu) as max_k FROM tousenbango');
+        const result = await pool.query('SELECT MAX(kaibetsu) as max_k FROM hazurekaisu');
         const maxKaibetsu = result.rows[0].max_k || 0;
         res.json({ success: true, kaibetsu: maxKaibetsu }); // kaibetsuを返す
     } catch (e) {
