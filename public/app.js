@@ -227,7 +227,7 @@ var hazerukaisuUpdate = async function(latestTousen) {
     console.log(`[DEBUG] latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
     console.log(`[DEBUG] currentKaibetsu: ${currentKaibetsu}`);
     // const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
-    console.log(`[DEBUG] ループを開始します。maxLoop: ${maxLoop}`);
+    // console.log(`[DEBUG] ループを開始します。maxLoop: ${maxLoop}`);
 
     while (currentKaibetsu <= latestTousen.kaibetsu) {
     //   while (currentKaibetsu <= maxLoop) {
