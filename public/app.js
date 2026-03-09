@@ -238,11 +238,11 @@ var hazerukaisuUpdate = async function(latestTousen) {
         const tousenRecord = await apiGet(`tousen/by-kaibetsu/${currentKaibetsu}`);
 
         // サーバーからの生のレスポンスをログに出す（最重要！）
-        console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, res);
+        console.log(`[DEBUG] 第${currentKaibetsu}回のレスポンス内容:`, tousenRecord);
 
-        if (!res || !res.success || !res.data) {
+        if (!tousenRecord || !tousenRecord.success || !tousenRecord.data) {
             console.warn(`tousenbango record missing for kaibetsu ${currentKaibetsu}. Stopping loop.`);
-            console.warn(`[DEBUG] 第${currentKaibetsu}回が見つからない、またはエラーのためループを終了します。原因:`, res ? res.message : "レスポンス空");
+            console.warn(`[DEBUG] 第${currentKaibetsu}回が見つからない、またはエラーのためループを終了します。原因:`, tousenRecord ? tousenRecord.message : "レスポンス空");
             break; 
         }
 
