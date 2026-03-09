@@ -220,18 +220,17 @@ var hazerukaisuUpdate = async function(latestTousen) {
 
     console.log(`[DEBUG] サーバーから取得した最新回情報 latestHazure.kaibetsu: ${latestHazure.kaibetsu}`);
 
-    // let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
-    //let currentKaibetsu = (latestHazure && latestHazure.kaibetsu) ? latestHazure.kaibetsu + 1 : 1;
-    let currentKaibetsu = 255;
+    let currentKaibetsu = (latestHazure && latestHazure.kaibetsu) ? latestHazure.kaibetsu + 1 : 1;
+    // let currentKaibetsu = 255;
     let recordsUpdated = 0;
 
     console.log(`[DEBUG] latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
     console.log(`[DEBUG] currentKaibetsu: ${currentKaibetsu}`);
-    const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
+    // const maxLoop = latestHazure && latestHazure.kaibetsu ? latestHazure.kaibetsu : 0;
     console.log(`[DEBUG] ループを開始します。maxLoop: ${maxLoop}`);
 
-    // while (currentKaibetsu <= latestTousen.kaibetsu) {
-       while (currentKaibetsu <= maxLoop) {
+    while (currentKaibetsu <= latestTousen.kaibetsu) {
+    //   while (currentKaibetsu <= maxLoop) {
         
         console.log(`Processing kaibetsu: ${currentKaibetsu}`);
         
