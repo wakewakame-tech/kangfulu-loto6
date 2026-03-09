@@ -260,8 +260,8 @@ var hazerukaisuUpdate = async function(latestTousen) {
             newHazure[key] = (newHazure[key] || 0) + 1; 
         }
         
-        // const d = res.data;
-        const tousen = [tousenRecord.hit1, tousenRecord.hit2, tousenRecord.hit3, tousenRecord.hit4, tousenRecord.hit5, tousenRecord.hit6];
+         const d = tousenRecord.data;
+        const tousen = [d.hit1, d.hit2, d.hit3, d.hit4, d.hit5, d.hit6];
         
         console.log(`[DEBUG] 第${currentKaibetsu}回のデータ解析を開始: hits=[${tousen.join(', ')}]`);
 
