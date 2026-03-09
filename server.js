@@ -216,8 +216,7 @@ app.post('/api/hazure/update', async (req, res) => {
     const sql = `
         INSERT INTO hazurekaisu (${columns.join(', ')}) 
         VALUES (${columns.map(() => '?').join(', ')})
-        ON CONFLICT(kaibetsu) DO UPDATE SET
-            ${updateSets.join(', ')}
+        ON CONFLICT(kaibetsu) DO UPDATE SET ${updateSets.join(', ')}
     `;
     /*
     try {

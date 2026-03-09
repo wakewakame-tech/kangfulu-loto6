@@ -72,7 +72,7 @@ var apiSend = async function(endpoint, method, data) {
     const url = buildUrl(endpoint);
     console.log(`[apiSend] url: ${url}`);
     console.log(`[apiSend] method: ${method}`);
-    console.log(`[apiSend] data: ${data.kaibetsu}`);
+    console.log(`[apiSend] data.kaibetsu: ${data.kaibetsu}`);
     try {
         const response = await fetch(url, {
             method: method,
