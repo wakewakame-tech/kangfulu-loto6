@@ -221,8 +221,8 @@ var hazerukaisuUpdate = async function(latestTousen) {
     console.log(`[DEBUG] サーバーから取得した最新回情報 latestHazure.kaibetsu: ${latestHazure.kaibetsu}`);
 
     // let currentKaibetsu = latestHazure ? latestHazure.kaibetsu + 1 : 1;
-    let currentKaibetsu = (latestHazure && latestHazure.kaibetsu) ? latestHazure.kaibetsu + 1 : 1;
-    //let currentKaibetsu = 1;
+    //let currentKaibetsu = (latestHazure && latestHazure.kaibetsu) ? latestHazure.kaibetsu + 1 : 1;
+    let currentKaibetsu = 255;
     let recordsUpdated = 0;
 
     console.log(`[DEBUG] latestTousen.kaibetsu: ${latestTousen.kaibetsu}`);
