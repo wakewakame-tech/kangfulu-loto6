@@ -145,7 +145,7 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     `;
 
     try {
-        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, data.createdat, data.hotcount, data.coldcount, data.hotcoldpattern, data.computedat, rinsetsucount, repeatcount, shimoiichikicount, acvalue]);
+        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, data.createdat, data.hotcount, data.coldcount, data.hotcoldpattern, data.computedat, rinsetsuCount, repeatCount, shimoiichikiCount, acValue]);
         res.json({ message: 'Success', kaibetsu: data.kaibetsu });
     } catch (e) {
         console.error(e);
