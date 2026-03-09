@@ -111,6 +111,7 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     const hotSet = new Set();
     recent.rows.forEach(r => [r.hit1, r.hit2, r.hit3, r.hit4, r.hit5, r.hit6].forEach(n => hotSet.add(n)));
     
+
     const { hotCount, coldCount, hotColdPattern, computedAt } = await computeHotColdForRecord(data, hotSet);
     
     // 前回データ取得（隣接・リピート用）
@@ -145,7 +146,7 @@ app.post('/api/tousen/register', allowOnlyLocal, async (req, res) => {
     `;
 
     try {
-        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, data.createdat, hotCount, coldCount, hotColdPattern, computedAt, rinsetsuCount, repeatCount, shimoiichikiCount, acValue]);
+        await pool.query(sql, [data.kaibetsu, hits[0], hits[1], hits[2], hits[3], hits[4], hits[5], data.bonus, guusuu, daishou, goukei, createdAt, hotCount, coldCount, hotColdPattern, computedAt, rinsetsuCount, repeatCount, shimoiichikiCount, acValue]);
         res.json({ message: 'Success', kaibetsu: data.kaibetsu });
     } catch (e) {
         console.error(e);
