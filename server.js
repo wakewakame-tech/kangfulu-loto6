@@ -188,6 +188,8 @@ app.get('/api/tousen/hazure/:num', async (req, res) => {
 app.post('/api/hazure/update', async (req, res) => {
     const data = req.body;
     const createdAt = new Date().toISOString();
+
+    console.log("[SERVER DEBUG] Received Data:", JSON.stringify(data));
     
     // Calculate Goukei and L10 on the server side
     let goukei = 0;
@@ -218,6 +220,7 @@ app.post('/api/hazure/update', async (req, res) => {
         VALUES (${columns.map(() => '?').join(', ')})
         ON CONFLICT(kaibetsu) DO UPDATE SET ${updateSets.join(', ')}
     `;
+    console.log(`[SERVER DEBUG] hazure/update sql: ${sql}`); // ★追加
     /*
     try {
         const result = await db.run(sql, values);
